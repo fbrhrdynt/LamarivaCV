@@ -1,0 +1,60 @@
+{
+  "name": "lamariva",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=22.16"
+  },
+  "scripts": {
+    "dev": "next dev --hostname 127.0.0.1 --port 3035",
+    "build": "prisma generate && next build --webpack",
+    "start": "next start --hostname 127.0.0.1 --port ${PORT:-3035}",
+    "typecheck": "tsc --noEmit",
+    "db:migrate": "prisma migrate deploy",
+    "db:seed": "node --import tsx scripts/seed.ts",
+    "admin:create": "node --import tsx scripts/admin.ts",
+    "jobs:sync": "node --import tsx scripts/sync.ts",
+    "test": "node --import tsx --test tests/model.test.ts",
+    "test:acceptance": "node --import tsx scripts/qa-runner.ts",
+    "test:e2e": "playwright test"
+  },
+  "dependencies": {
+    "@prisma/adapter-pg": "^7.0.0",
+    "@prisma/client": "^7.0.0",
+    "@react-pdf/renderer": "^4.3.0",
+    "better-auth": "1.7.7",
+    "docx": "^9.5.0",
+    "dotenv": "^17.2.0",
+    "next": "16.4.0",
+    "nodemailer": "10.0.16",
+    "pg": "^8.16.3",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0",
+    "react-hook-form": "^7.65.0",
+    "sanitize-html": "^2.17.0",
+    "zod": "^4.1.0"
+  },
+  "overrides": {
+    "deepmerge-ts": "8.0.2",
+    "mysql2": "3.24.5"
+  },
+  "devDependencies": {
+    "@electric-sql/pglite": "^0.5.8",
+    "@electric-sql/pglite-socket": "^0.2.11",
+    "@playwright/test": "^1.56.0",
+    "@sparticuz/chromium": "^153.0.0",
+    "@types/node": "^22.0.0",
+    "@types/nodemailer": "^7.0.0",
+    "@types/pg": "^8.15.0",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "@types/sanitize-html": "^2.16.0",
+    "@types/smtp-server": "^3.5.13",
+    "prettier": "^3.9.9",
+    "prisma": "^7.0.0",
+    "smtp-server": "^3.19.18",
+    "tsx": "^4.20.0",
+    "typescript": "^5.9.0"
+  }
+}

@@ -1,0 +1,233 @@
+generator client {
+  provider = "prisma-client"
+  output = "../src/generated/prisma"
+}
+datasource db {
+  provider = "postgresql"
+}
+model User {
+  id String @id @default(uuid())
+  name String
+  email String @unique
+  emailVerified Boolean @default(false)
+  image String?
+  role String @default("USER")
+  permissions String[] @default([])
+  suspended Boolean @default(false)
+  locale String @default("id")
+  defaultTemplateId String?
+  consentAt DateTime?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  sessions Session[]
+  accounts Account[]
+  profile Profile?
+  documents Document[]
+  applications Application[]
+  savedJobs SavedJob[]
+  tickets SupportTicket[]
+  exports DocumentExport[]
+  @@map("user")
+}
+model Session {
+  id String @id @default(uuid())
+  token String @unique
+  expiresAt DateTime
+  ipAddress String?
+  userAgent String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  userId String
+  user User @relation(fields:[userId], references:[id], onDelete:Cascade)
+  @@index([userId])
+  @@map("session")
+}
+model Account {
+  id String @id @default(uuid())
+  accountId String
+  providerId String
+  userId String
+  accessToken String?
+  refreshToken String?
+  idToken String?
+  accessTokenExpiresAt DateTime?
+  refreshTokenExpiresAt DateTime?
+  scope String?
+  password String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  user User @relation(fields:[userId], references:[id], onDelete:Cascade)
+  @@unique([providerId, accountId])
+  @@index([userId])
+  @@map("account")
+}
+model Verification {
+  id String @id @default(uuid())
+  identifier String
+  value String
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  @@index([identifier])
+  @@map("verification")
+}
+model RecoveryToken {
+  id String @id @default(uuid())
+  userId String
+  hash String @unique
+  kind String
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+  @@index([userId])
+}
+model Profile {
+  id String @id @default(uuid())
+  userId String @unique
+  data Json
+  updatedAt DateTime @updatedAt
+  user User @relation(fields:[userId],references:[id],onDelete:Cascade)
+}
+model Template {
+  id String @id
+  name String
+  kind String @default("CV")
+  ats Boolean @default(false)
+  active Boolean @default(true)
+  isDefault Boolean @default(false)
+  position Int @default(0)
+  version Int @default(1)
+  config Json
+  updatedAt DateTime @updatedAt
+}
+model Document {
+  id String @id @default(uuid())
+  userId String
+  kind String
+  title String
+  templateId String @default("ats-standard")
+  data Json
+  revision Int @default(1)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  user User @relation(fields:[userId],references:[id],onDelete:Cascade)
+  versions DocumentVersion[]
+  @@index([userId, kind, updatedAt])
+}
+model DocumentVersion {
+  id String @id @default(uuid())
+  documentId String
+  revision Int
+  title String
+  templateId String
+  data Json
+  createdAt DateTime @default(now())
+  document Document @relation(fields:[documentId],references:[id],onDelete:Cascade)
+  @@unique([documentId,revision])
+}
+model DocumentExport {
+  id String @id @default(uuid())
+  userId String
+  documentId String
+  format String
+  createdAt DateTime @default(now())
+  user User @relation(fields:[userId],references:[id],onDelete:Cascade)
+  @@index([createdAt])
+}
+model JobProvider {
+  id String @id @default(uuid())
+  kind String
+  source String
+  active Boolean @default(false)
+  intervalHours Int @default(24)
+  lastSyncAt DateTime?
+  lastError String?
+  syncingUntil DateTime?
+  createdAt DateTime @default(now())
+  jobs Job[]
+  @@unique([kind,source])
+}
+model Job {
+  id String @id @default(uuid())
+  providerId String?
+  externalId String
+  title String
+  company String
+  location String @default("")
+  country String @default("")
+  arrangement String @default("")
+  employmentType String @default("")
+  seniority String @default("")
+  salary String @default("")
+  description String
+  url String
+  source String
+  postedAt DateTime?
+  expiresAt DateTime?
+  syncedAt DateTime @default(now())
+  active Boolean @default(true)
+  provider JobProvider? @relation(fields:[providerId],references:[id],onDelete:SetNull)
+  savedBy SavedJob[]
+  @@unique([providerId,externalId])
+  @@index([active,postedAt])
+}
+model SavedJob {
+  id String @id @default(uuid())
+  userId String
+  jobId String
+  createdAt DateTime @default(now())
+  user User @relation(fields:[userId],references:[id],onDelete:Cascade)
+  job Job @relation(fields:[jobId],references:[id],onDelete:Cascade)
+  @@unique([userId,jobId])
+}
+model Application {
+  id String @id @default(uuid())
+  userId String
+  company String
+  title String
+  status String @default("Interested")
+  location String @default("")
+  url String @default("")
+  source String @default("")
+  cvId String?
+  letterId String?
+  appliedDate String @default("")
+  followUpDate String @default("")
+  notes String @default("")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  user User @relation(fields:[userId],references:[id],onDelete:Cascade)
+  @@index([userId,status])
+}
+model Setting {
+  key String @id
+  value Json
+  updatedAt DateTime @updatedAt
+}
+model AuditLog {
+  id String @id @default(uuid())
+  actorId String?
+  action String
+  target String
+  reason String @default("")
+  createdAt DateTime @default(now())
+  @@index([createdAt])
+}
+model SystemEvent {
+  id String @id @default(uuid())
+  kind String
+  status String
+  message String
+  createdAt DateTime @default(now())
+  @@index([kind,createdAt])
+}
+model SupportTicket {
+  id String @id @default(uuid())
+  userId String
+  subject String
+  message String
+  reply String @default("")
+  status String @default("OPEN")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  user User @relation(fields:[userId],references:[id],onDelete:Cascade)
+}

@@ -1,0 +1,24 @@
+LAMARIVA v1.0 - SOURCE CODE UNTUK VPS UBUNTU
+
+1. Baca INSTALL-VPS-ID.md untuk tutorial lengkap Bahasa Indonesia.
+2. Buat /opt/lamariva dan jadikan ubuntu sebagai pemilik.
+3. Upload ZIP melalui WinSCP sebagai ubuntu, lalu ekstrak di /opt/lamariva.
+4. Isi .env, siapkan PostgreSQL, install dependency, generate Prisma,
+   migrasi, seed dan build sesuai tutorial.
+5. Buat Super Admin, jalankan PM2, atur Nginx dan SSL untuk domain Anda.
+
+ZIP ini berisi source code, bukan node_modules atau build siap jalan.
+Tidak ada password admin default. Tidak ada kredensial produksi di dalam ZIP.
+Package.json berada langsung di root ZIP, tanpa folder pembungkus tambahan.
+
+Stack: Next.js + TypeScript + Better Auth + PostgreSQL/Prisma + PM2.
+Port default: 3035, hanya localhost. Tidak menggunakan Docker.
+
+Fitur inti: profil, CV, cover letter, PDF/DOCX, lowongan, tracker, admin,
+email verification/reset, ID/EN, tema terang/gelap, navigasi mobile.
+
+Status dan batas implementasi: docs/QA.md.
+Catatan desain: DESIGN.md dan docs/ANTI_SLOP.md.
+Fitur opsional belum seluruhnya mencakup PRD; lihat daftar di docs/QA.md.
+Google OAuth, delivery SMTP nyata, backup restore dan sinkronisasi provider
+perlu diuji dengan domain/kredensial VPS Anda sebelum dibuka ke publik.
