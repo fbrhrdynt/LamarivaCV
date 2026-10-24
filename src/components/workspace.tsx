@@ -1,4 +1,5 @@
 "use client";
+import {FebroLogin} from "./febro-login";
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -220,6 +221,7 @@ export function Workspace({ path }: { path: string[] }) {
               )}
             </nav>
             <div className="sidebar-bottom">
+              {user && <FebroLogin />}
               {preferences}
               <div className="account-info">
                 <span className="initial">
@@ -270,6 +272,7 @@ export function Workspace({ path }: { path: string[] }) {
               <Link href="/help">{t("Panduan", "Help")}</Link>
             </nav>
             <div className="row">
+              {user && <FebroLogin />}
               {preferences}
               <Link className="button" href={user ? "/dashboard" : "/login"}>
                 {user ? "Dashboard" : t("Masuk", "Sign in")}
@@ -536,6 +539,7 @@ function AuthPage({ mode }: { mode: string }) {
                     : t("Masuk", "Sign in")}
           </button>
         </form>
+        <FebroLogin />
         {(register || mode === "login") && site?.googleAvailable && (
           <>
             <p className="separator">{t("atau", "or")}</p>

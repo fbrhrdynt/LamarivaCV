@@ -1,0 +1,3 @@
+export type Options={app:string;origin:string;issuer:string;clientId:string;clientSecret:string;callbackPath:string;basePath?:string;repo:any;currentLocal:(req:Request)=>Promise<any>;reauthenticate:(req:Request,user:any,password:string)=>Promise<boolean>;issueSession:(user:any,response:Response,req:Request)=>Promise<void>;audit?:(event:{event:string})=>void;testOnly?:boolean;allowGuestLogin?:boolean;localLogout?:(req:Request,response:Response)=>Promise<void>;clientFactory?:any};
+export function createSSO(options:Options):(req:Request)=>Promise<Response|null>;
+export function canonicalRequest(req:Request,origin:string):Request;

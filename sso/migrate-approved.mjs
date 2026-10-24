@@ -1,0 +1,8 @@
+import fs from 'node:fs';import path from 'node:path';import {createRequire} from 'node:module';import {DatabaseSync} from 'node:sqlite';import {migration,repository,pgConnection,sqliteConnection} from './repository.mjs';
+const [app,mode='--dry-run']=process.argv.slice(2);const sql=migration(app);if(mode==='--dry-run'){console.log('BEGIN;\n'+sql.join(';\n')+';\nCOMMIT;');process.exit(0);}
+if(mode!=='--apply-approved'||!process.env.FEBRO_APPROVAL_FILE)throw Error('Explicit reviewed approval file required');
+const approval=JSON.parse(fs.readFileSync(process.env.FEBRO_APPROVAL_FILE,'utf8'));if(approval.app!==app||approval.operation!=='deploy'||approval.https_acceptance!==true||!approval.approved_by)throw Error('Production migration gate not satisfied');
+let connection,close;
+if(['files','play'].includes(app)){const root=process.cwd(),dir=path.resolve(root,process.env.DATA_DIR||(app==='play'?'storage/leaderboard':'data')),file=path.join(dir,app==='files'?'files.sqlite':'arcade.sqlite');if(!fs.existsSync(file))throw Error('Existing database required; refusing to create one');const db=new DatabaseSync(file);db.exec('PRAGMA foreign_keys=ON; PRAGMA busy_timeout=5000');connection=sqliteConnection(db);close=()=>db.close();}
+else{if(!process.env.DATABASE_URL)throw Error('Reviewed DATABASE_URL required');const require=createRequire(path.resolve('package.json')),{Pool}=require('pg'),pool=new Pool({connectionString:process.env.DATABASE_URL,max:1});connection=pgConnection(pool);close=()=>pool.end();}
+try{await connection.transaction(async c=>{for(const statement of sql)await c.query(statement);});console.log('Additive identity schema applied. Existing IDs and ownership unchanged.');}finally{await close();}
