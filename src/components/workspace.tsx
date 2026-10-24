@@ -221,7 +221,7 @@ export function Workspace({ path }: { path: string[] }) {
               )}
             </nav>
             <div className="sidebar-bottom">
-              {user && <FebroLogin />}
+              
               {preferences}
               <div className="account-info">
                 <span className="initial">
@@ -272,7 +272,7 @@ export function Workspace({ path }: { path: string[] }) {
               <Link href="/help">{t("Panduan", "Help")}</Link>
             </nav>
             <div className="row">
-              {user && <FebroLogin />}
+              
               {preferences}
               <Link className="button" href={user ? "/dashboard" : "/login"}>
                 {user ? "Dashboard" : t("Masuk", "Sign in")}
